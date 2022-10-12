@@ -1,6 +1,7 @@
 class ZLibrary {
 	// Required Libraries
 	#axios = require('axios');
+	#cookie_helper = require('../helpers/cookie-helper').default;
 
 	// Singleton-Specific Static Variables Used.
 	/** 
@@ -17,7 +18,7 @@ class ZLibrary {
 }
 	
 	// Instance Variables
-	#cookie_jar;
+	#cookieJar;
 
 
 	// Constructor
@@ -32,7 +33,7 @@ class ZLibrary {
 
 	// Public Static Methods
 	static getOrCreateInstance() {
-		if (ZLibrary.#isInstanceAbsent) {
+		if (ZLibrary.#isInstanceAbsent()) {
 			ZLibrary.#initialisingDisallowed = false;
 			ZLibrary.#instance = new this
 		}
@@ -49,7 +50,7 @@ class ZLibrary {
 	}
 
 	// Instance Methods
-	login(email, password) {
+	async login(email, password) {
 		const data = {
 			"isModal": true,
 			"email": email,
@@ -59,15 +60,33 @@ class ZLibrary {
 			"isSingleLogin": 1,
 			"redirectUrl": "",
 			"gg_json_mode": 1
-		}
+		};
 
 
-		const response = this.#axios.post(ZLibrary.LOGIN_URI, null, { headers: ZLibrary.REQ_HEADERS, params: data });
-		this.#cookie_jar = response;
-		
-		// TODO: Complete this function for three scenarios: successful log-in, unsuccessful log-in, and errors.
-		// TODO: PS - Status code doesn't work. Bad wiring by ZLibrary guys xD.
-		return this.#cookie_jar;
+		const response = await this.#axios.post(ZLibrary.LOGIN_URI, null, { headers: ZLibrary.REQ_HEADERS, params: data });
+		const serializedCookies = response.headers["set-cookie"];
+
+		this.#cookieJar = this.#cookie_helper.parseCookies(serializedCookies);
+		const isLogInFailure = !(this.#cookieJar['remix_userid'] && this.#cookieJar['remix_userkey'])
+
+		if (isLogInFailure) this.#clearCookieJar();
+
+		return this.isUserLoggedIn();
+	}
+
+	logout() {
+		this.#clearCookieJar();
+		return true;
+	}
+
+	isUserLoggedIn() {
+		return !!(this.#cookieJar);
+	}
+
+	// Private Instance Methods
+
+	#clearCookieJar() {
+		this.#cookieJar = null;
 	}
 }
 
