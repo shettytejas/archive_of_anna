@@ -15,7 +15,7 @@
     "1lib"
   ],
   "scripts": {
-    "test": "test"
+    "test": "echo \"Error: No tests specified!\" && exit 1"
   },
   "author": "Tejas Shetty",
   "license": "MIT",
