@@ -1,7 +1,7 @@
 (async () => {
   const { default: zLibrary } = require('./src/models/z-library');
 
-  zLibrary.getOrCreateInstance();
+  zLibrary.initialize();
 
-  exports.default = zLibrary
-})()
+  exports.default = zLibrary;
+})();

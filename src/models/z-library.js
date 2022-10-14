@@ -1,93 +1,149 @@
+/**
+ * The API wrapper of ZLibrary.
+ * This is a singleton class and should already be instantiated on require.
+ * If not, use the initialize() method to instantiate a singleton instance.
+ *
+ * If the singleton is not instantiated, all the methods called will return undefined.
+ */
 class ZLibrary {
-	// Required Libraries
-	#axios = require('axios');
-	#cookie_helper = require('../helpers/cookie-helper').default;
+// Required Libraries
+  #axios = require('axios');
+  #cookie_helper = require('../helpers/cookie-helper').default;
 
-	// Singleton-Specific Static Variables Used.
-	/** 
-	*	@type {ZLibrary}
-	*/
-	static #instance;
-	static #initialisingDisallowed = true;
+  // Singleton-Specific Static Variables Used.
+  /**
+  * This variable will hold the instance object of the class.
+  * @type {ZLibrary}
+  */
+  static #instance;
 
-	// Constant Variables
-	static ZLIB_BASE_URI = 'https://1lib.in';
-	static LOGIN_URI = 'https://singlelogin.app/rpc.php'
-	static REQ_HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
-}
-	
-	// Instance Variables
-	#cookieJar;
+  /**
+   * This variable specifies whether or not the constructor can instantiate a new object.
+   * @type {Boolean}
+   */
+  static #initialisingDisallowed = true;
+
+  // Constant Variables
+
+  /**
+   * The base URI used to connect to ZLibrary.
+   */
+  static ZLIB_BASE_URI = 'https://1lib.in';
+  /**
+   * The URI used to login a user.
+   */
+  static LOGIN_URI = 'https://singlelogin.app/rpc.php';
+  /**
+   * The request headers with a valid client. Without this, the URIs respond with a "Client Denied" message.
+   */
+  static REQ_HEADERS = { 'User-Agent': 'PostmanRuntime/7.29.2' };
+
+  // Instance Variables
+
+  /**
+   * This variable contains the logged in user's cookies.
+   */
+  #cookieJar;
 
 
-	// Constructor
-	
-	constructor() {
-		if (ZLibrary.#initialisingDisallowed) {
-			throw new Error("Initialising of a singleton is not allowed. Please use the getOrCreateInstance() method!")
-		}
+  // Constructor
 
-		ZLibrary.#initialisingDisallowed = true;
-	}
+  /**
+   * @constructor
+   */
+  constructor() {
+    if (ZLibrary.#initialisingDisallowed) {
+      throw new Error('Initialising of a singleton is not allowed. Please use the initialize() method!');
+    }
 
-	// Public Static Methods
-	static getOrCreateInstance() {
-		if (ZLibrary.#isInstanceAbsent()) {
-			ZLibrary.#initialisingDisallowed = false;
-			ZLibrary.#instance = new this
-		}
-	}
+    ZLibrary.#initialisingDisallowed = true;
+  }
 
+  // Public Static Methods
+
+  /**
+   * The method is used to initialize the instance of the singleton.
+   */
+  static initialize() {
+    if (this.isInstansiated()) return;
+
+    this.#initialisingDisallowed = false;
+    this.#instance = new this;
+  }
+
+  /**
+   * This method is used to log in the user into ZLibrary.
+   * @param {String} email Email of the User
+   * @param {String} password Password of the User
+   * @return {Boolean} True if the user has successfully logged in, else false.
+   */
   static login(email, password) {
-		return ZLibrary.#instance.login(email, password);
-	}
+    return this.#instance.login(email, password);
+  }
 
-	// Private Static Methods
+  /**
+   * This method is used to check whether the class is instantiated.
+   * @return {Boolean} True if the class is instantiated, else false.
+   */
+  static isInstansiated() {
+    return !!this.#instance;
+  }
 
-	static #isInstanceAbsent() {
-		return !ZLibrary.#instance;
-	}
+  // Instance Methods
 
-	// Instance Methods
-	async login(email, password) {
-		const data = {
-			"isModal": true,
-			"email": email,
-			"password": password,
-			"site_mode": "books",
-			"action": "login",
-			"isSingleLogin": 1,
-			"redirectUrl": "",
-			"gg_json_mode": 1
-		};
+  /**
+   * This is the instance method which is used to log in the user into ZLibrary.
+   * @param {String} email Email of the User
+   * @param {String} password Password of the User
+   * @return {Boolean} True if the user has successfully logged in, else false.
+   */
+  async login(email, password) {
+    const data = {
+      'isModal': true,
+      'email': email,
+      'password': password,
+      'site_mode': 'books',
+      'action': 'login',
+      'isSingleLogin': 1,
+      'redirectUrl': '',
+      'gg_json_mode': 1,
+    };
 
 
-		const response = await this.#axios.post(ZLibrary.LOGIN_URI, null, { headers: ZLibrary.REQ_HEADERS, params: data });
-		const serializedCookies = response.headers["set-cookie"];
+    const response = await this.#axios.post(ZLibrary.LOGIN_URI, null, { headers: ZLibrary.REQ_HEADERS, params: data });
+    const serializedCookies = response.headers['set-cookie'];
 
-		this.#cookieJar = this.#cookie_helper.parseCookies(serializedCookies);
-		const isLogInFailure = !(this.#cookieJar['remix_userid'] && this.#cookieJar['remix_userkey'])
+    this.#cookieJar = this.#cookie_helper.parseCookies(serializedCookies);
+    const isLogInFailure = !(this.#cookieJar['remix_userid'] && this.#cookieJar['remix_userkey']);
 
-		if (isLogInFailure) this.#clearCookieJar();
+    if (isLogInFailure) this.#clearCookieJar();
 
-		return this.isUserLoggedIn();
-	}
+    return this.isUserLoggedIn();
+  }
 
-	logout() {
-		this.#clearCookieJar();
-		return true;
-	}
+  /**
+   * This instance method logs out the user.
+   */
+  logout() {
+    this.#clearCookieJar();
+  }
 
-	isUserLoggedIn() {
-		return !!(this.#cookieJar);
-	}
+  /**
+   * This instance method checks if the user is logged in.
+   * @return {Boolean} True if the user's logged in (cookie data is present), else false.
+   */
+  isUserLoggedIn() {
+    return !!(this.#cookieJar);
+  }
 
-	// Private Instance Methods
+  // Private Instance Methods
 
-	#clearCookieJar() {
-		this.#cookieJar = null;
-	}
+  /**
+   * This instance method clears the #cookieJar variable (hence removing the user's data).
+   */
+  #clearCookieJar() {
+    this.#cookieJar = null;
+  }
 }
 
 exports.default = ZLibrary;
