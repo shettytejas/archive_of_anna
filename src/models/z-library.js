@@ -129,7 +129,7 @@ class ZLibrary {
   }
 
   /**
-   * This instance method checks if the user is logged in.
+   * Checks if the user is logged in.
    * @return {Boolean} True if the user's logged in (cookie data is present), else false.
    */
   isUserLoggedIn() {
@@ -139,7 +139,7 @@ class ZLibrary {
   // Private Instance Methods
 
   /**
-   * This instance method clears the #cookieJar variable (hence removing the user's data).
+   * Clears the cookie data.
    */
   #clearCookieJar() {
     this.#cookieJar = null;

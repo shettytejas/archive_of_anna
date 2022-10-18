@@ -54,7 +54,7 @@ class CookieHelper {
   }
 
   /**
-   * This method parses the entire cookie string from a response header.
+   * This method parses the cookie string and returns a map of key value pairs.
    * @param {String} cookieStr The cookie string
    * @return {Map<String, String>} Map of key value pairs.
    */
