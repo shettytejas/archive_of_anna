@@ -5,7 +5,7 @@ class CookieHelper {
   /**
    * Set of keys which were not necessary to me.
    */
-  static #USELESS_KEYS = new Set(['SameSite', 'path', 'secure', 'domain', 'path', 'Max-Age', 'expires', 'language']);
+  static #USELESS_KEYS = new Set('SameSite', 'path', 'secure', 'domain', 'path', 'Max-Age', 'expires', 'language');
 
   /**
    * @constructor
@@ -28,13 +28,14 @@ class CookieHelper {
     if (singleCookieStr.indexOf('=') == singleCookieStr.lastIndexOf('=')) {
       const [key, value] = singleCookieStr.split('=');
       if (this.#USELESS_KEYS.has(key)) return null;
+
       return [key, value];
     } else if (singleCookieStr.indexOf(',') > -1) {
       return singleCookieStr.split(/, ?/).map((c) => this.#parseCookie(c));
     } else {
       return null;
     }
-  };
+  }
 
   /**
    * Inserts the [key,value] array in the given map as { key: value }.
@@ -60,9 +61,14 @@ class CookieHelper {
    */
   static parseCookies(cookieStr) {
     const result = {};
-    cookieStr.split(/; ?/).map((c)=> this.#parseCookie(c)).forEach((c) => this.#insertInMap(c, result));
+
+    cookieStr
+      .split(/; ?/)
+      .map((c) => this.#parseCookie(c))
+      .forEach((c) => this.#insertInMap(c, result));
+
     return result;
-  };
+  }
 }
 
 exports.default = CookieHelper;
