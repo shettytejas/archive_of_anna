@@ -14,6 +14,7 @@
   "rules": {
     "max-len": ["error", 120],
     "indent": ["error", 2],
-    "object-curly-spacing": ["error", "always"]
+    "object-curly-spacing": ["error", "always"],
+    "quotes": "off"
   }
 }
