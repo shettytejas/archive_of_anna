@@ -1,4 +1,4 @@
-const { default: CookieHelper } = require('../../../src/helpers/cookie-helper');
+const { default: CookieHelper } = require('../../src/helpers/cookie-helper');
 const expect = require('chai').expect;
 
 describe("CookieHelper's", () => {
