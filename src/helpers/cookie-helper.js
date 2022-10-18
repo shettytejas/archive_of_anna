@@ -5,7 +5,7 @@ class CookieHelper {
   /**
    * Set of keys which were not necessary to me.
    */
-  static #USELESS_KEYS = new Set('SameSite', 'path', 'secure', 'domain', 'path', 'Max-Age', 'expires', 'language');
+  static USELESS_KEYS = new Set(['SameSite', 'path', 'secure', 'domain', 'path', 'Max-Age', 'expires', 'language']);
 
   /**
    * @constructor
@@ -15,6 +15,7 @@ class CookieHelper {
   }
 
   /**
+   * TODO: This is method is wayyy far from completion!
    * This method parses a single cookie string.
    * A single cookie string should be of pattern: key=value.
    * In case due to some cookie pattern, where some cookies are separated with a comma,
@@ -24,14 +25,14 @@ class CookieHelper {
    * @param {String} singleCookieStr Cookie String of pattern -> key=value
    * @return {(String[]|null)} Returns [key, value] if parsing is successful, else null.
    */
-  static #parseCookie(singleCookieStr) {
+  static parseCookie(singleCookieStr) {
     if (singleCookieStr.indexOf('=') == singleCookieStr.lastIndexOf('=')) {
       const [key, value] = singleCookieStr.split('=');
-      if (this.#USELESS_KEYS.has(key)) return null;
+      if (this.USELESS_KEYS.has(key)) return null;
 
       return [key, value];
     } else if (singleCookieStr.indexOf(',') > -1) {
-      return singleCookieStr.split(/, ?/).map((c) => this.#parseCookie(c));
+      return singleCookieStr.split(/, ?/).map((c) => this.parseCookie(c));
     } else {
       return null;
     }
@@ -44,13 +45,13 @@ class CookieHelper {
    * @param {Map<String, String>} map The map to insert key value pairs into.
    * @return {void}
    */
-  static #insertInMap(cookieArr, map) {
+  static insertInMap(cookieArr, map) {
     if (cookieArr === null) return;
 
     if (typeof cookieArr[0] === 'string') {
       map[cookieArr[0]] = cookieArr[1];
     } else {
-      cookieArr.forEach((c) => this.#insertInMap(c, map));
+      cookieArr.forEach((c) => this.insertInMap(c, map));
     }
   }
 
@@ -64,11 +65,15 @@ class CookieHelper {
 
     cookieStr
       .split(/; ?/)
-      .map((c) => this.#parseCookie(c))
-      .forEach((c) => this.#insertInMap(c, result));
+      .map((c) => this.parseCookie(c))
+      .forEach((c) => this.insertInMap(c, result));
 
     return result;
   }
+
+  /**
+   * TODO: To Cookie String!
+   */
 }
 
 exports.default = CookieHelper;
