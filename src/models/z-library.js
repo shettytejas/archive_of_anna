@@ -8,7 +8,7 @@
 class ZLibrary {
   // Required Libraries
   #axios = require('axios');
-  #cookie_helper = require('../helpers/cookie-helper').default;
+  #CookieToMap = require('cookie-to-map');
 
   // Singleton-Specific Static Variables Used.
   /**
@@ -112,12 +112,11 @@ class ZLibrary {
       headers: ZLibrary.REQ_HEADERS,
       params: data,
     });
-    const serializedCookies = response.headers['set-cookie'];
 
-    this.#cookieJar = this.#cookie_helper.parseCookies(serializedCookies);
-    const isLogInFailure = !(this.#cookieJar['remix_userid'] && this.#cookieJar['remix_userkey']);
+    this.#cookieJar = this.#CookieToMap.parseCookieString(response.headers['set-cookie']);
+    const loginFailed = !(this.#cookieJar.get('remix_userid') && this.#cookieJar.get('remix_userkey'));
 
-    if (isLogInFailure) this.#clearCookieJar();
+    if (loginFailed) this.#clearCookieJar();
 
     return this.isUserLoggedIn();
   }
@@ -147,4 +146,4 @@ class ZLibrary {
   }
 }
 
-exports.default = ZLibrary;
+module.exports = ZLibrary;
