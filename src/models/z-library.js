@@ -6,15 +6,15 @@
  * If the singleton is not instantiated, all the methods called will return undefined.
  */
 class ZLibrary {
-// Required Libraries
+  // Required Libraries
   #axios = require('axios');
-  #cookie_helper = require('../helpers/cookie-helper').default;
+  #CookieToMap = require('cookie-to-map');
 
   // Singleton-Specific Static Variables Used.
   /**
-  * This variable will hold the instance object of the class.
-  * @type {ZLibrary}
-  */
+   * This variable will hold the instance object of the class.
+   * @type {ZLibrary}
+   */
   static #instance;
 
   /**
@@ -45,7 +45,6 @@ class ZLibrary {
    */
   #cookieJar;
 
-
   // Constructor
 
   /**
@@ -68,7 +67,7 @@ class ZLibrary {
     if (this.isInstansiated()) return;
 
     this.#initialisingDisallowed = false;
-    this.#instance = new this;
+    this.#instance = new this();
   }
 
   /**
@@ -99,24 +98,25 @@ class ZLibrary {
    */
   async login(email, password) {
     const data = {
-      'isModal': true,
-      'email': email,
-      'password': password,
-      'site_mode': 'books',
-      'action': 'login',
-      'isSingleLogin': 1,
-      'redirectUrl': '',
-      'gg_json_mode': 1,
+      isModal: true,
+      email: email,
+      password: password,
+      site_mode: 'books',
+      action: 'login',
+      isSingleLogin: 1,
+      redirectUrl: '',
+      gg_json_mode: 1,
     };
 
+    const response = await this.#axios.post(ZLibrary.LOGIN_URI, null, {
+      headers: ZLibrary.REQ_HEADERS,
+      params: data,
+    });
 
-    const response = await this.#axios.post(ZLibrary.LOGIN_URI, null, { headers: ZLibrary.REQ_HEADERS, params: data });
-    const serializedCookies = response.headers['set-cookie'];
+    this.#cookieJar = this.#CookieToMap.parseCookieString(response.headers['set-cookie']);
+    const loginFailed = !(this.#cookieJar.get('remix_userid') && this.#cookieJar.get('remix_userkey'));
 
-    this.#cookieJar = this.#cookie_helper.parseCookies(serializedCookies);
-    const isLogInFailure = !(this.#cookieJar['remix_userid'] && this.#cookieJar['remix_userkey']);
-
-    if (isLogInFailure) this.#clearCookieJar();
+    if (loginFailed) this.#clearCookieJar();
 
     return this.isUserLoggedIn();
   }
@@ -129,21 +129,21 @@ class ZLibrary {
   }
 
   /**
-   * This instance method checks if the user is logged in.
+   * Checks if the user is logged in.
    * @return {Boolean} True if the user's logged in (cookie data is present), else false.
    */
   isUserLoggedIn() {
-    return !!(this.#cookieJar);
+    return !!this.#cookieJar;
   }
 
   // Private Instance Methods
 
   /**
-   * This instance method clears the #cookieJar variable (hence removing the user's data).
+   * Clears the cookie data.
    */
   #clearCookieJar() {
     this.#cookieJar = null;
   }
 }
 
-exports.default = ZLibrary;
+module.exports = ZLibrary;

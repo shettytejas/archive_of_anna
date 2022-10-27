@@ -12,8 +12,10 @@
     "ecmaVersion": "latest"
   },
   "rules": {
-    "max-len": ["error", 120],
+    "max-len": ["error", 140],
     "indent": ["error", 2],
-    "object-curly-spacing": ["error", "always"]
+    "object-curly-spacing": ["error", "always"],
+    "quotes": "off",
+    "prefer-const": "error"
   }
 }
