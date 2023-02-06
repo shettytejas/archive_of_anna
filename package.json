@@ -1,9 +1,10 @@
 {
-  "name": "zlibrary",
+  "name": "archive_of_anna",
   "version": "0.1.0",
-  "description": "Unofficial Z-Library API written in JS.",
+  "description": "Unofficial Anna's Archive API written in JS.",
   "main": "index.js",
   "keywords": [
+    "annas_archive",
     "zlibrary",
     "api",
     "books",
@@ -12,7 +13,8 @@
     "ebook",
     "z-lib",
     "library",
-    "1lib"
+    "1lib",
+    "shadow library"
   ],
   "scripts": {
     "test": "nyc --reporter=html --check-coverage --lines 90 --per-file mocha spec/**/*.js --recursive --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=reports/mocha/test-results.xml",
@@ -22,7 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^1.1.2",
-    "cookie-to-map": "^0.6.2"
+    "cheerio": "^1.0.0-rc.12"
   },
   "devDependencies": {
     "chai": "^4.3.6",

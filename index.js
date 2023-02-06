@@ -1,7 +1,3 @@
 (async () => {
-  const ZLibrary = require('./src/models/z-library');
-
-  ZLibrary.initialize();
-
-  module.exports = ZLibrary;
+  module.exports = require('./src/models/archive-of-anna');
 })();
