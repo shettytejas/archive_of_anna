@@ -1,5 +1,15 @@
 const { MD5_PREFIX } = require('../constants');
 
+const authors = (fileUnifiedData) => {
+  const authors = [...fileUnifiedData.author_additional];
+
+  if (authors.length == 0) authors.push(fileUnifiedData.author_best);
+
+  return authors;
+};
+
+const coverUrl = (fileUnifiedData) => fileUnifiedData.cover_url_best;
+
 /**
  * It takes a Cbeerio object loaded with a single search result, and returns an object containing the information about that search result
  * @param {Cheerio<Element>} loadedElement - The element that was loaded.
@@ -10,15 +20,15 @@ const { MD5_PREFIX } = require('../constants');
  *   path: The path to the content
  *   name: The name of the content
  */
-const searchContent = (loadedElement) => {
-  const fullContentPath = loadedElement.find('a').attr('href');
-  const coverUrl = loadedElement.find('img').attr('src');
-  const authors = loadedElement.find('.truncate.italic').text().split(/, ?/); // TODO: Better Author Name Detection
-  const contentName = loadedElement.find('h3').text();
+const fetchContent = (loadedElement) => {
+  const rawMetadata = loadedElement.find('.js-technical-details.hidden>div>div:last-child').text();
+  const jsonMetadata = JSON.parse(rawMetadata.replace(/\s{2,}/g, ''));
+
+  const fileUnifiedData = jsonMetadata.file_unified_data;
 
   return {
-    authors: authors,
-    coverUrl: coverUrl,
+    authors: authors(fileUnifiedData),
+    coverUrl: coverUrl(fileUnifiedData),
     // TODO: Search results only show MD5 links for now (ref. https://annas-archive.org/datasets#files). This might change in future!!!
     md5: fullContentPath.replace(MD5_PREFIX, ''),
     name: contentName,
@@ -26,4 +36,4 @@ const searchContent = (loadedElement) => {
   };
 };
 
-module.exports = searchContent;
+module.exports = fetchContent;

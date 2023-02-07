@@ -1,5 +1,6 @@
 const { BASE_URI, MD5_PREFIX } = require('../constants');
 const cheerio = require('../libraries/cheerio-helper');
+const fetchContent = require('../models/fetch-content');
 const searchContent = require('../models/search-content');
 
 const searchHelper = {
@@ -56,8 +57,7 @@ const searchHelper = {
   getContent: (fetchResponse) => {
     const htmlData = fetchResponse;
     const $ = cheerio.load(htmlData);
-
-    console.log('debugger'); // TODO: Pending.
+    return fetchContent($('main'));
   },
 };
 

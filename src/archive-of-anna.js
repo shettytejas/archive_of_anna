@@ -36,7 +36,7 @@ class ArchiveOfAnna {
    * @param {String} md5 - The id or prefixed md5 to the content you want to fetch.
    * TODO: Fix Documentation
    */
-  static async fetch(md5) {
+  static async fetch_by_md5(md5) {
     const url = searchHelper.buildFetchUrl(md5);
     const response = await axiosHelper.get(url);
     return searchHelper.getContent(response.data); // TODO: Pending
