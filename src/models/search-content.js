@@ -1,4 +1,4 @@
-const { CONTENT_PATH_PREFIX } = require('../constants');
+const { MD5_PREFIX } = require('../constants');
 
 /**
  * It takes a Cbeerio object loaded with a single search result, and returns an object containing the information about that search result
@@ -19,8 +19,9 @@ const searchContent = (loadedElement) => {
   return {
     authors: authors,
     coverUrl: coverUrl,
-    id: fullContentPath.replace(CONTENT_PATH_PREFIX, ''),
-    path: fullContentPath,
+    // TODO: Search results only show MD5 links for now (ref. https://annas-archive.org/datasets#files). This might change in future!!!
+    md5: fullContentPath.replace(MD5_PREFIX, ''),
+    contentUrl: fullContentPath,
     name: contentName,
     // TODO: Publisher Details Detection
   };

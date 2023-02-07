@@ -32,12 +32,12 @@ class ArchiveOfAnna {
   }
 
   /**
-   * It fetches the content of a given path from the Anna's Archive API
-   * @param {String} path - The id or prefixed path to the content you want to fetch.
+   * It fetches the content of a given md5 from the Anna's Archive API
+   * @param {String} md5 - The id or prefixed md5 to the content you want to fetch.
    * TODO: Fix Documentation
    */
-  static async fetch(path) {
-    const url = searchHelper.buildFetchUrl(path);
+  static async fetch(md5) {
+    const url = searchHelper.buildFetchUrl(md5);
     const response = await axiosHelper.get(url);
     return searchHelper.getContent(response.data); // TODO: Pending
   }

@@ -4,5 +4,6 @@
   "printWidth": 120,
   "tabWidth": 2,
   "semi": true,
-  "bracketSpacing": true
+  "bracketSpacing": true,
+  "quoteProps": "consistent"
 }

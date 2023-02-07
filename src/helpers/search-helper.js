@@ -1,4 +1,4 @@
-const { BASE_URI, CONTENT_PATH_PREFIX } = require('../constants');
+const { BASE_URI, MD5_PREFIX } = require('../constants');
 const cheerio = require('../libraries/cheerio-helper');
 const searchContent = require('../models/search-content');
 
@@ -42,17 +42,23 @@ const searchHelper = {
   },
   /**
    * It takes in a bunch of parameters and returns a URL object with those parameters set
-   * @param {String} id - The content id or prefixed id to be fetched.
+   * @param {String} md5Path - The content md5 or prefixed md5 to be fetched.
    * @return {URL} A URL object with the formed url.
    */
-  buildFetchUrl: (id) => {
-    let path = id;
+  buildFetchUrl: (md5Path) => {
+    let path = md5Path;
 
-    if (!path.startsWith(CONTENT_PATH_PREFIX)) path = CONTENT_PATH_PREFIX + path;
+    // TODO: Search results only show MD5 links for now (ref. https://annas-archive.org/datasets#files). This might change in future!!!
+    if (!path.startsWith(MD5_PREFIX)) path = MD5_PREFIX + path;
 
     return new URL(BASE_URI + path);
   },
-  getContent: (fetchResponse) => {}, // TODO: Pending
+  getContent: (fetchResponse) => {
+    const htmlData = fetchResponse;
+    const $ = cheerio.load(htmlData);
+
+    console.log('debugger'); // TODO: Pending.
+  },
 };
 
 module.exports = searchHelper;
