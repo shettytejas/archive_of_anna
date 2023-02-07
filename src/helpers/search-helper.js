@@ -1,11 +1,10 @@
-const { CONTENT_PATH_PREFIX } = require('../constants');
+const { BASE_URI, CONTENT_PATH_PREFIX } = require('../constants');
 const cheerio = require('../libraries/cheerio-helper');
 const searchContent = require('../models/search-content');
 
 const searchHelper = {
   /**
    * It takes in a bunch of parameters and returns a URL object with those parameters set
-   * @param {String} baseUri - The base URI.
    * @param {String} query - The search query.
    * @param {String} lang - The language of the search results.
    * @param {String} content - The type of content to search for. Can be one of:
@@ -13,8 +12,8 @@ const searchHelper = {
    * @param {String} sort - The sort order of the results.
    * @return {URL} A URL object with the search parameters set.
    */
-  buildSearchUrl: (baseUri, query, lang, content, ext, sort) => {
-    const url = new URL(baseUri + '/search');
+  buildSearchUrl: (query, lang, content, ext, sort) => {
+    const url = new URL(BASE_URI + '/search');
 
     url.searchParams.set('q', query);
     url.searchParams.set('lang', lang);
@@ -27,12 +26,12 @@ const searchHelper = {
   /**
    * > The function takes in a response from a search request, removes the comments from the HTML data,
    * loads the HTML into Cheerio, and then returns an array of objects containing the required data from the search results.
-   * @param {Object} searchResponse - The response from the search request.
+   * @param {Object} searchResponseHtml - The response from the search request.
    * @return {Object[]} An array of objects.
    */
-  collectContents: (searchResponse) => {
+  collectContents: (searchResponseHtml) => {
     // Remove comment identifiers. Used for client-side pagination by the website while loading content.
-    const htmlData = searchResponse.data.replace(/(<!--|-->)/g, '');
+    const htmlData = searchResponseHtml.replace(/(<!--|-->)/g, '');
     const $ = cheerio.load(htmlData);
     const collection = [];
 
@@ -43,16 +42,15 @@ const searchHelper = {
   },
   /**
    * It takes in a bunch of parameters and returns a URL object with those parameters set
-   * @param {String} baseUri - The base URI.
-   * @param {String} id - The content id to be fetched.
+   * @param {String} id - The content id or prefixed id to be fetched.
    * @return {URL} A URL object with the formed url.
    */
-  buildFetchUrl: (baseUri, id) => {
+  buildFetchUrl: (id) => {
     let path = id;
 
     if (!path.startsWith(CONTENT_PATH_PREFIX)) path = CONTENT_PATH_PREFIX + path;
 
-    return new URL(baseUri + path);
+    return new URL(BASE_URI + path);
   },
   getContent: (fetchResponse) => {}, // TODO: Pending
 };

@@ -1,3 +1,1 @@
-(async () => {
-  module.exports = require('./src/models/archive-of-anna');
-})();
+module.exports = require('./src/archive-of-anna');
