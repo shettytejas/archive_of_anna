@@ -1,4 +1,7 @@
-const { BASE_URI, MD5_PREFIX } = require('../constants');
+const {
+  BASE_URI,
+  PATH_PREFIXES: { MD5 },
+} = require('../constants');
 const cheerio = require('../libraries/cheerio-helper');
 const fetchContent = require('../models/fetch-content');
 const searchContent = require('../models/search-content');
@@ -50,13 +53,12 @@ const searchHelper = {
     let path = md5Path;
 
     // TODO: Search results only show MD5 links for now (ref. https://annas-archive.org/datasets#files). This might change in future!!!
-    if (!path.startsWith(MD5_PREFIX)) path = MD5_PREFIX + path;
+    if (!path.startsWith(MD5)) path = MD5 + path;
 
     return new URL(BASE_URI + path);
   },
   getContent: (fetchResponse) => {
-    const htmlData = fetchResponse;
-    const $ = cheerio.load(htmlData);
+    const $ = cheerio.load(fetchResponse);
     return fetchContent($('main'));
   },
 };

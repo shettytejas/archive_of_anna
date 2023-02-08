@@ -1,5 +1,8 @@
-const { MD5_PREFIX } = require('../constants');
+const {
+  PATH_PREFIXES: { MD5 },
+} = require('../constants');
 
+// TODO: Better handling of Mapper.
 /**
  * It takes a Cbeerio object loaded with a single search result, and returns an object containing the information about that search result
  * @param {Cheerio<Element>} loadedElement - The element that was loaded.
@@ -11,18 +14,12 @@ const { MD5_PREFIX } = require('../constants');
  *   name: The name of the content
  */
 const searchContent = (loadedElement) => {
-  const fullContentPath = loadedElement.find('a').attr('href');
-  const coverUrl = loadedElement.find('img').attr('src');
-  const authors = loadedElement.find('.truncate.italic').text().split(/, ?/); // TODO: Better Author Name Detection
-  const contentName = loadedElement.find('h3').text();
-
+  // TODO: Search results only show MD5 links for now (ref. https://annas-archive.org/datasets#files). This might change in future!!!
   return {
-    authors: authors,
-    coverUrl: coverUrl,
-    // TODO: Search results only show MD5 links for now (ref. https://annas-archive.org/datasets#files). This might change in future!!!
-    md5: fullContentPath.replace(MD5_PREFIX, ''),
-    name: contentName,
-    // TODO: Publisher Details Detection
+    authors: loadedElement.find('.truncate.italic').text(),
+    coverUrl: loadedElement.find('img').attr('src'),
+    md5: loadedElement.find('a').attr('href').replace(MD5, ''),
+    title: loadedElement.find('h3').text(),
   };
 };
 

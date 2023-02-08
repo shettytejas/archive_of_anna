@@ -1,4 +1,6 @@
 module.exports = {
   BASE_URI: 'https://annas-archive.org',
-  MD5_PREFIX: '/md5/',
+  PATH_PREFIXES: {
+    MD5: '/md5/',
+  },
 };

@@ -1,14 +1,26 @@
-const { MD5_PREFIX } = require('../constants');
+// TODO: Better handling of Mapper.
+const mapper = (jsonMetadata) => {
+  const fileUnifiedData = jsonMetadata.file_unified_data;
+  const authors = (fileUnifiedData) => {
+    const authors = [...fileUnifiedData.author_additional];
+    if (authors.length == 0) authors.push(fileUnifiedData.author_best);
 
-const authors = (fileUnifiedData) => {
-  const authors = [...fileUnifiedData.author_additional];
+    return authors;
+  };
 
-  if (authors.length == 0) authors.push(fileUnifiedData.author_best);
-
-  return authors;
+  return {
+    authors: authors(fileUnifiedData),
+    coverUrl: fileUnifiedData.cover_url_best,
+    description: fileUnifiedData.stripped_description_best,
+    downloadLinks: [], // TODO: Pending
+    extension: fileUnifiedData.extension_best,
+    isbnCodes: fileUnifiedData.sanitized_isbns,
+    md5: jsonMetadata.md5,
+    publisher: fileUnifiedData.publisher_best,
+    title: fileUnifiedData.title_best,
+    year: parseInt(fileUnifiedData.year_best),
+  };
 };
-
-const coverUrl = (fileUnifiedData) => fileUnifiedData.cover_url_best;
 
 /**
  * It takes a Cbeerio object loaded with a single search result, and returns an object containing the information about that search result
@@ -23,17 +35,7 @@ const coverUrl = (fileUnifiedData) => fileUnifiedData.cover_url_best;
 const fetchContent = (loadedElement) => {
   const rawMetadata = loadedElement.find('.js-technical-details.hidden>div>div:last-child').text();
   const jsonMetadata = JSON.parse(rawMetadata.replace(/\s{2,}/g, ''));
-
-  const fileUnifiedData = jsonMetadata.file_unified_data;
-
-  return {
-    authors: authors(fileUnifiedData),
-    coverUrl: coverUrl(fileUnifiedData),
-    // TODO: Search results only show MD5 links for now (ref. https://annas-archive.org/datasets#files). This might change in future!!!
-    md5: fullContentPath.replace(MD5_PREFIX, ''),
-    name: contentName,
-    // TODO: Publisher Details Detection
-  };
+  return mapper(jsonMetadata);
 };
 
 module.exports = fetchContent;
