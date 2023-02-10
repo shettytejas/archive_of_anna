@@ -2,7 +2,7 @@ const {
   PATH_PREFIXES: { MD5 },
 } = require('../constants');
 
-// TODO: Better handling of Mapper.
+// TODO: Better handling of Mapper required?
 /**
  * It takes a Cbeerio object loaded with a single search result, and returns an object containing the information about that search result
  * @param {Cheerio<Element>} loadedElement - The element that was loaded.
