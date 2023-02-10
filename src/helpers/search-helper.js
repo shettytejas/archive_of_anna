@@ -57,8 +57,15 @@ const searchHelper = {
 
     return new URL(BASE_URI + path);
   },
-  getContent: (fetchResponse) => {
-    const $ = cheerio.load(fetchResponse);
+
+  /**
+   * It takes in response from fetch request, loads the HTML into Cheerio,
+   * and then returns an object containing the required data from the fetch result.
+   * @param {Object} fetchResponseHtml - The content md5 or prefixed md5 to be fetched.
+   * @return {Object} A URL object with the formed url.
+   */
+  getContent: (fetchResponseHtml) => {
+    const $ = cheerio.load(fetchResponseHtml);
     return fetchContent($('main'));
   },
 };
