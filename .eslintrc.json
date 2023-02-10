@@ -16,6 +16,7 @@
     "indent": ["error", 2],
     "object-curly-spacing": ["error", "always"],
     "quotes": "off",
-    "prefer-const": "error"
+    "prefer-const": "error",
+    "require-await": "error"
   }
 }
