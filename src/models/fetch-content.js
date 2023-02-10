@@ -1,4 +1,5 @@
 // TODO: Better handling of Mapper required?
+
 const mapper = (jsonMetadata) => {
   const fileUnifiedData = jsonMetadata.file_unified_data;
 
@@ -49,14 +50,19 @@ const mapper = (jsonMetadata) => {
 };
 
 /**
- * It takes a Cbeerio object loaded with a single search result, and returns an object containing the information about that search result
- * @param {Cheerio<Element>} loadedElement - The element that was loaded.
+ * It takes a Cheerio object loaded with a content result, and returns an object containing the detailed information about that content.
+ * @param {Cheerio<Element>} loadedElement - The cheerio element that was loaded scraped from the request.
  * @return {Object} An object with the following properties:
  *   authors: An array of authors
  *   coverUrl: The URL of the cover image
- *   id: The ID of the content
- *   path: The path to the content
- *   name: The name of the content
+ *   description: The sanitised description of the content
+ *   downloadLinks: The segregated download links of the content
+ *   extension: The extension of the content the download links provide.
+ *   isbnCodes: The sanitised ISBN codes of the content (if the content is a book?) // TODO: Check if correct?
+ *   md5L The MD5 hash of the content
+ *   publisher: The publisher of the content
+ *   title: The title of the content
+ *   year: The year of publish? for the content // TODO: Check if correct?
  */
 const fetchContent = (loadedElement) => {
   const rawMetadata = loadedElement.find('.js-technical-details.hidden>div>div:last-child').text();

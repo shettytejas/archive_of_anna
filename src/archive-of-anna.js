@@ -32,14 +32,15 @@ class ArchiveOfAnna {
   }
 
   /**
-   * It fetches the content of a given md5 from the Anna's Archive API
-   * @param {String} md5 - The id or prefixed md5 to the content you want to fetch.
-   * TODO: Fix Documentation
+   * It takes a md5 hash, builds a url, makes a request to that url, and returns the content of the response
+   * @param {String} md5 - The md5 hash of the file you want to search for. You can get this from search.
+   * @return {Object} The content of the response.
+   * TODO: Fix documentation.
    */
   static async fetch_by_md5(md5) {
     const url = searchHelper.buildFetchUrl(md5);
     const response = await axiosHelper.get(url);
-    return searchHelper.getContent(response.data); // TODO: Pending
+    return searchHelper.getContent(response.data);
   }
 }
 
