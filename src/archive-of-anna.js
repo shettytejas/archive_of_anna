@@ -1,4 +1,5 @@
 // Helpers
+const downloadHelper = require('./helpers/download-helper');
 const searchHelper = require('./helpers/search-helper');
 
 // Libraries
@@ -37,10 +38,31 @@ class ArchiveOfAnna {
    * @return {Object} The content of the response.
    * TODO: Fix documentation.
    */
-  static async fetch_by_md5(md5) {
+  static async fetchByMd5(md5) {
     const url = searchHelper.buildFetchUrl(md5);
     const response = await axiosHelper.get(url);
     return searchHelper.getContent(response.data);
+  }
+
+  /**
+   * It takes an array of IPFS links and returns a promise that resolves to an array of the same length,
+   * where each element is the file contents of the corresponding IPFS link
+   * @param {Array} ipfsLinks - An array of IPFS links.
+   * @return {File} the result of the downloadHelper.ipfs function.
+   * TODO: Fix Documentation.
+   */
+  static downloadFileViaIpfs(ipfsLinks) {
+    return downloadHelper.ipfs(ipfsLinks);
+  }
+
+  /**
+   * It takes a list of links to Libgen, and downloads the files
+   * @param {Array} libgenLinks - An array of links to the libgen mirrors.
+   * @param {String|undefined} [fork] - The number of parallel downloads you want to run.
+   * @return {File} A promise.
+   */
+  static downloadFileViaLibgen(libgenLinks, fork = undefined) {
+    return downloadHelper.libgen(libgenLinks, fork);
   }
 }
 
