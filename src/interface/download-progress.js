@@ -1,16 +1,9 @@
-// TODO: Open an inteface for getting download progress that's using download-helper. https://github.com/jhereu/node-global-storage
+const store = require('../store');
 
-// module.exports = () => {
-//   const progress = {};
-
-//   return {
-//     setProgress: (name, progressEvent) => {
-//       const percent = (progressEvent.loaded * 100) / progressEvent.total;
-//       progress[name] = Math.round(percent);
-//     },
-
-//     getProgress: (name) => {
-//       return progress[name];
-//     },
-//   };
-// };
+module.exports = {
+  getProgress: (key) => store.downloadProgress[key],
+  setProgress: (key, progressEvent) => {
+    const percent = Math.floor((progressEvent.loaded * 100) / progressEvent.total);
+    store.downloadProgress[key] = percent;
+  },
+};
