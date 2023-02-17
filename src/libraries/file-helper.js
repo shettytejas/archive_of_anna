@@ -1,20 +1,24 @@
 const fs = require('fs');
+const util = require('util');
+const stream = require('stream');
+const pipeline = util.promisify(stream.pipeline);
+const nodePath = require('path');
 
-const fsHelper = {
-  writeFileToPath: (path, fileName, content) => {
-    const writer = fs.createWriteStream(path + fileName);
+// ? Do I need this as a helper method across the library?
+const pathJoiner = (...paths) => nodePath.join(...paths);
 
-    content.pipe(writer); // Starts Writing content
+const fileHelper = {
+  writeFileToPath: async (path, fileName, content) => {
+    const writeTo = pathJoiner(path, fileName);
+    const writer = fs.createWriteStream(writeTo);
 
-    return new Promise((resolve, reject) => {
-      writer.on('finish', () => {
-        writer.close(resolve);
-      });
-      writer.on('error', reject);
-    });
+    await pipeline(content, writer);
+
+    return fs.existsSync(writeTo);
+  },
+  directorySetup: (path) => {
+    fs.existsSync(path) || fs.mkdirSync(path, { recursive: true });
   },
 };
 
-// TODO: Check for the returned Promise on how it resolves or rejects.
-
-module.exports = fsHelper;
+module.exports = fileHelper;

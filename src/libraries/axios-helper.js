@@ -5,15 +5,18 @@ const headers = { 'User-Agent': 'PostmanRuntime/7.30.0' };
 
 const axiosHelper = {
   get: (url) => axios.get(url, { headers: headers }),
-  download: (url) =>
-    axios.get(url, {
+  download: (url, name = undefined) => {
+    const downloadProgressKey = name || url;
+
+    return axios.get(url, {
       headers: headers,
       responseType: 'stream',
       onDownloadProgress: (progressEvent) => {
-        setProgress('test', progressEvent);
-        console.log('Current Progress: ' + getProgress('test') + '%');
+        setProgress(downloadProgressKey, progressEvent);
+        console.log('Current Progress: ' + getProgress(downloadProgressKey) + '%'); // TODO: Remove this console log after setting up hooks.
       },
-    }),
+    });
+  },
 };
 
 module.exports = axiosHelper;

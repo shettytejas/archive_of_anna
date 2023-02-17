@@ -1,47 +1,54 @@
-const { DOWNLOAD_PATH } = require('../constants');
 const axiosHelper = require('../libraries/axios-helper');
-const fsHelper = require('../libraries/file-helper');
+const fileHelper = require('../libraries/file-helper');
 
-const FILENAME_HEADER = 'filename="';
+const getSubstringIndicesForFilename = (contentDispositionHeader) => {
+  const filenameHeader = 'filename="';
+  const startIndex = contentDispositionHeader.indexOf(filenameHeader) + filenameHeader.length;
+  const endIndex = contentDispositionHeader.indexOf('"', startIndex);
 
-const downloader = async (link) => {
-  const result = [null, null];
-  try {
-    const response = await axiosHelper.download(link);
-
-    if (response.status != 200) return [null, null];
-
-    const contentDispositionHeader = response.headers['content-disposition'];
-    const fileNameIndex = contentDispositionHeader.indexOf(FILENAME_HEADER) + FILENAME_HEADER.length;
-    const fileName = contentDispositionHeader.substring(fileNameIndex, contentDispositionHeader.indexOf('"', fileNameIndex));
-
-    [result[0], result[1]] = [fileName, response.data];
-  } catch (error) {
-    console.log(error);
-  }
-
-  return result;
+  return [startIndex, endIndex];
 };
 
-const downloadFile = async (links, path = DOWNLOAD_PATH) => {
+const getFileNameFromHeaders = (response) => {
+  const contentDispositionHeader = response.headers['content-disposition'];
+  const [startIndex, endIndex] = getSubstringIndicesForFilename(contentDispositionHeader);
+
+  return contentDispositionHeader.substring(startIndex, endIndex);
+};
+
+const getFileExtensionFromHeaders = (response) => {
+  const fileName = getFileNameFromHeaders(response);
+  return fileName.substring(fileName.lastIndexOf('.') + 1);
+};
+
+const getCustomFileName = (name) => `${name}.${getFileExtensionFromHeaders(response)}`;
+
+const getFileNameAndContent = async (name, link) => {
+  const response = await axiosHelper.download(link, name);
+  if (response.status != 200) return [null, null];
+
+  const fileName = name ? getCustomFileName(name) : getFileNameFromHeaders(response);
+
+  return [fileName, response.data];
+};
+
+const downloadFileFromGivenLinks = async (links, name, path) => {
+  fileHelper.directorySetup(path); // Setup the download directory if it doesn't exist.
+
   for (const link of links) {
-    const [fileName, content] = await downloader(link);
+    const [fileName, content] = await getFileNameAndContent(name, link);
 
-    if (!fileName) continue;
+    if (!content) continue;
 
-    const file = fsHelper.writeFileToPath(path, fileName, content);
-
-    return file; // TODO: Check if await is needed?
+    return await fileHelper.writeFileToPath(path, fileName, content);
   }
 
-  throw new Error('File could not be downloaded due to an unknown error. Please try again later.');
+  throw new Error('File could not be downloaded due to server error. Please try again later.');
 };
 
 const downloadHelper = {
-  ipfs: async (ipfsLinks) => {
-    return await downloadFile(ipfsLinks);
-  },
-  libgenDownload: (libgenLinks, fork) => {},
+  ipfs: async (ipfsLinks, name, path) => await downloadFileFromGivenLinks(ipfsLinks, name, path),
+  libgenDownload: (libgenLinks, fork, name, path) => {},
   torDownload: () => {}, // TODO: Not in current scope. Need to check if axios can be self-contained for Tor requests.
 };
 
