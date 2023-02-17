@@ -1,4 +1,6 @@
 // Helpers
+const { DOWNLOAD_PATH } = require('./constants');
+const downloadHelper = require('./helpers/download-helper');
 const searchHelper = require('./helpers/search-helper');
 
 // Libraries
@@ -37,10 +39,36 @@ class ArchiveOfAnna {
    * @return {Object} The content of the response.
    * TODO: Fix documentation.
    */
-  static async fetch_by_md5(md5) {
+  static async fetchByMd5(md5) {
     const url = searchHelper.buildFetchUrl(md5);
     const response = await axiosHelper.get(url);
     return searchHelper.getContent(response.data);
+  }
+
+  /**
+   * It takes an array of IPFS links and returns a promise that resolves to an array of the same length,
+   * where each element is the file contents of the corresponding IPFS link
+   * @param {Array} ipfsLinks - An array of IPFS links.
+   * @param {String|undefined} name - Name for the file to be saved as.
+   * @param {String} path - Path to save the file to.
+   * @return {File} the result of the downloadHelper.ipfs function.
+   * TODO: Fix Documentation.
+   */
+  static downloadFileViaIpfs(ipfsLinks, name = undefined, path = DOWNLOAD_PATH) {
+    return downloadHelper.ipfs(ipfsLinks, name, path);
+  }
+
+  /**
+   * It takes a list of links to Libgen, and downloads the files
+   * @param {Array} libgenLinks - An array of links to the libgen mirrors.
+   * @param {String|undefined} fork - The fork to download the file from.
+   * @param {String|undefined} name - Name for the file to be saved as.
+   * @param {String} path - Path to save the file to.
+   * @return {File} A promise.
+   * TODO: Fix Documentation
+   */
+  static downloadFileViaLibgen(libgenLinks, fork = undefined, name = undefined, path = DOWNLOAD_PATH) {
+    return downloadHelper.libgenDownload(libgenLinks, fork, name, path);
   }
 }
 
